@@ -2,35 +2,58 @@
 var express = require('express');
 var burgers = express.Router();
 
-var app = express();
 var dumpMethod = (req,res)=>res.send( req.method + " burgers! // METHOD NOT IMPLEMENTED" );
 var test = 'testing';
 
+var burgerData = [];
+
 burgers.route('/')
-  .get((req,res)=>res.send(test + ' burger homepage'))
-  .post(dumpMethod)
-  .put(dumpMethod)
-  .delete(dumpMethod);
+  .get((req,res)=>res.send({data:burgerData}))
+  .post((req,res)=>{
+    burgerData.push(req.body);
 
-// burgers.get('/burgers', (req,res)=>res.send(test + ' burgers'));
-// burgers.post('/burgers', dumpMethod);
-// burgers.put('/burgers', dumpMethod);
-// burgers.delete('/burgers', dumpMethod);
+    var newID = burgerData.length-1;
+  	res.redirect('./burgers/'+ newID);
+  });
+burgers.route('/new')
+  .get((req,res)=>res.send(test + ' burger'));
 
-burgers.get('/burgers/:id', (req,res)=>res.send(test + ' burger/id'));
-burgers.post('/burgers/:id', dumpMethod);
-burgers.put('/burgers/:id', dumpMethod);
-burgers.delete('/burgers/:id', dumpMethod);
-// app.use( '/burgers', burgerRoutes)
+burgers.route('/:burgerID')
+  .get((req,res)=>{
+    console.log('burger id');
+    var bID = req.params.burgerID;
+    if(!(bID in burgerData)){
+      res.sendStatus(404);
+      return;
+    }
+    // res.send({data:burgerData[bID]});
+    console.log(burgerData);
+    res.send({data:burgerData[bID]});
 
-burgers.get('/burgers/new', (req,res)=>res.send(test + ' burger'));
-burgers.post('/burgers/new', dumpMethod);
-burgers.put('/burgers/new', dumpMethod);
-burgers.delete('/burgers/new', dumpMethod);
+  })
+  .put((req,res)=>{
+    var bID = req.params.burgerID;
+    if(!(bID in burgerData)){
+      res.sendStatus(404);
+      return;
+    }
+    burgerData[bID] = req.body;
 
-burgers.get('/burgers/:id/edit', (req,res)=>res.send(test + ' burger/ID/edit'));
-burgers.post('/burgers/:id/edit', dumpMethod);
-burgers.put('/burgers/:id/edit', dumpMethod);
-burgers.delete('/burgers/:id/edit', dumpMethod);
+    res.redirect(303, './' + bID);
+  })
+  .delete((req, res) => {
+    var bID = req.params.burgerID;
+    if(!(bID in burgerData)){
+      res.sendStatus(404);
+      return;
+    }
+    burgerData[bID]
+    res.redirect(303, './');
+});
+// app.use( '', burgerRoutes)
+
+burgers.route('/:burgerID/edit')
+  .get((req,res)=>res.send(test + ' burger/ID/edit'));
+
 
 module.exports = burgers;
