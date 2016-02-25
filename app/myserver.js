@@ -20,6 +20,8 @@ app.use( bodyParser.json());
 we'll POST to a url appended with ?_method=put */
 app.use(methodOverride('_method'));
 
+app.set('view engine', 'ejs');
+
 
 var dumpMethod = (req,res)=>res.send( req.method + " burgers! // METHOD NOT IMPLEMENTED" );
 var burgerRoutes = require( path.join(__dirname, '/routes/burgers'));
@@ -28,7 +30,7 @@ var test = 'testing';
 
 app.use( '/burgers', burgerRoutes);
 
-app.get('/', (req,res)=>res.send(test + ' homepage'));
+app.get('/', (req,res)=>res.render('pages/home.html.ejs'));
 app.post('/', dumpMethod);
 app.put('/', dumpMethod);
 app.delete('/', dumpMethod);

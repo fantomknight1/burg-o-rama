@@ -8,16 +8,23 @@ var test = 'testing';
 var burgerData = [];
 
 burgers.route('/')
-  .get((req,res)=>res.send({data:burgerData}))
+  .get((req,res)=>res.render('./pages/burger_list.html.ejs',{data:burgerData}))
   .post((req,res)=>{
     burgerData.push(req.body);
 
     var newID = burgerData.length-1;
-  	res.redirect('./burgers/'+ newID);
+  	res.redirect('/burgers/'+ newID);
   });
 burgers.route('/new')
-  .get((req,res)=>res.send(test + ' burger'));
-
+  .get((req,res)=>{
+    console.log('burger new');
+    var bID = req.params.burgerID;
+    if(!(bID in burgerData)){
+      res.sendStatus(404);
+      return;
+    }
+    res.render('./pages/burger_edit.html.ejs', {data:burgerData[bID]});
+  });
 burgers.route('/:burgerID')
   .get((req,res)=>{
     console.log('burger id');
@@ -28,7 +35,7 @@ burgers.route('/:burgerID')
     }
     // res.send({data:burgerData[bID]});
     console.log(burgerData);
-    res.send({data:burgerData[bID]});
+    res.render('./pages/burger_one.html.ejs', {data:burgerData[bID]});
 
   })
   .put((req,res)=>{
@@ -47,13 +54,13 @@ burgers.route('/:burgerID')
       res.sendStatus(404);
       return;
     }
-    burgerData[bID]
+    burgerData[bID] =
     res.redirect(303, './');
 });
 // app.use( '', burgerRoutes)
 
 burgers.route('/:burgerID/edit')
-  .get((req,res)=>res.send(test + ' burger/ID/edit'));
+  .get((req,res)=>res.render('./pages/burger_edit.html.ejs'));
 
 
 module.exports = burgers;
